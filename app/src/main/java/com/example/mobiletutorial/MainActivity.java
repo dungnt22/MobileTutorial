@@ -1,7 +1,10 @@
 package com.example.mobiletutorial;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.mobiletutorial.R;
+import com.example.mobiletutorial.databinding.ActivityMainBinding;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,14 +12,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.example.mobiletutorial.databinding.ActivityMainBinding;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup paymentMethod;
     private ProgressBar progressBar;
     private NumberPicker amountPicker;
-    private int totalDonate = 0;
+    private EditText amountText;
+    private TextView amountTotal;
+
+    private int totalDonated = 0;
+    private boolean targetAchieved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +68,13 @@ public class MainActivity extends AppCompatActivity {
         paymentMethod = (RadioGroup) findViewById(R.id.paymentMethod);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         amountPicker = (NumberPicker) findViewById(R.id.amountPicker);
+        amountText = (EditText) findViewById(R.id.paymentAmount);
+        amountTotal = (TextView) findViewById(R.id.total);
 
         amountPicker.setMinValue(0);
         amountPicker.setMaxValue(1000);
-
         progressBar.setMax(10000);
+        amountTotal.setText("$0");
     }
 
     @Override
@@ -79,11 +89,20 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+        switch (item.getItemId()) {
+            case R.id.menuReport:
+                startActivity(new Intent(this, Report.class));
+                break;
+            case R.id.menuDonate:
+                return true;
+            case R.id.action_settings:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -97,14 +116,31 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     public void donateButtonPressed(View view) {
-        int amount = amountPicker.getValue();
+        int donateAmount = amountPicker.getValue();
         int radioId = paymentMethod.getCheckedRadioButtonId();
 
-        totalDonate = totalDonate + amount;
-        progressBar.setProgress(totalDonate);
+//        if (donateAmount == 0) {
+        String text = amountText.getText().toString();
+        if (!text.equals("")) {
+            donateAmount = Integer.parseInt(text);
+            amountPicker.setValue(0);
+        }
+//        }
+
+        if (!targetAchieved) {
+            totalDonated = totalDonated + donateAmount;
+            targetAchieved = totalDonated >= 10000;
+            progressBar.setProgress(totalDonated);
+            String totalDonatedStr = "$" + totalDonated;
+            amountTotal.setText(totalDonatedStr);
+        } else {
+            Toast toast = Toast.makeText(this, "Target Exceeded!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
         String method = "";
         method = radioId == R.id.PayPal ? "PayPal" : "Direct";
-        Log.v("Donate", "Donate Pressed! " + amount + " With method " + method + "\n");
-        Log.v("Donate", "Current total Donate is " + totalDonate);
+        Log.v("Donate", "Donate Pressed! " + donateAmount + " With method " + method + "\n");
+        Log.v("Donate", "Current total Donate is " + totalDonated);
     }
 }

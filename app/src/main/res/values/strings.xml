@@ -14,4 +14,10 @@
     <string name="donateButton">DONATE</string>
     <string name="PayPal">PayPal</string>
     <string name="Direct">Direct</string>
+    <string name="menuReport">Report</string>
+    <string name="amount">Amount</string>
+    <string name="totalSoFar">Total so Far</string>
+    <string name="total">$ Total</string>
+    <string name="reportTitle">Report</string>
+    <string name="menuDonate">Donate</string>
 </resources>
