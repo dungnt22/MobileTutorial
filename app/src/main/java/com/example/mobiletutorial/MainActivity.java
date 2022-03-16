@@ -1,18 +1,15 @@
 package com.example.mobiletutorial;
 
-import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.mobiletutorial.R;
+import com.example.main.DonationApp;
 import com.example.mobiletutorial.databinding.ActivityMainBinding;
+import com.example.models.Donation;
 import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
 
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,9 +17,8 @@ import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Base {
 
     private ActivityMainBinding binding;
     private Button donateButton;
@@ -31,9 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private NumberPicker amountPicker;
     private EditText amountText;
     private TextView amountTotal;
-
-    private int totalDonated = 0;
-    private boolean targetAchieved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-//        setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         donateButton = (Button) findViewById(R.id.donateButton);
         if (donateButton != null) {
             Log.v("Donate", "Really got the donate button");
@@ -77,36 +66,6 @@ public class MainActivity extends AppCompatActivity {
         amountTotal.setText("$0");
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-        switch (item.getItemId()) {
-            case R.id.menuReport:
-                startActivity(new Intent(this, Report.class));
-                break;
-            case R.id.menuDonate:
-                return true;
-            case R.id.action_settings:
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 //    @Override
 //    public boolean onSupportNavigateUp() {
@@ -117,30 +76,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void donateButtonPressed(View view) {
         int donateAmount = amountPicker.getValue();
-        int radioId = paymentMethod.getCheckedRadioButtonId();
-
-//        if (donateAmount == 0) {
+        String method = paymentMethod.getCheckedRadioButtonId() == R.id.PayPal ? "PayPal" : "Direct";
         String text = amountText.getText().toString();
+
         if (!text.equals("")) {
             donateAmount = Integer.parseInt(text);
             amountPicker.setValue(0);
         }
-//        }
 
-        if (!targetAchieved) {
-            totalDonated = totalDonated + donateAmount;
-            targetAchieved = totalDonated >= 10000;
-            progressBar.setProgress(totalDonated);
-            String totalDonatedStr = "$" + totalDonated;
-            amountTotal.setText(totalDonatedStr);
-        } else {
-            Toast toast = Toast.makeText(this, "Target Exceeded!", Toast.LENGTH_SHORT);
-            toast.show();
+        if (donateAmount > 0) {
+            donationApp.newDonation(new Donation(donateAmount, method));
+            progressBar.setProgress(donationApp.getTotalDonated());
+            String str = "$" + donationApp.getTotalDonated();
+            amountTotal.setText(str);
         }
+    }
 
-        String method = "";
-        method = radioId == R.id.PayPal ? "PayPal" : "Direct";
-        Log.v("Donate", "Donate Pressed! " + donateAmount + " With method " + method + "\n");
-        Log.v("Donate", "Current total Donate is " + totalDonated);
+    public void reset(MenuItem menuItem) {
+        donationApp.dbManager.reset();
+        donationApp.setTotalDonated(0);
+        progressBar.setProgress(donationApp.getTotalDonated());
+        amountText.setText("");
+        String str = "$" + donationApp.getTotalDonated();
+        amountTotal.setText(str);
     }
 }
