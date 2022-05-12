@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobileTutorial</string>
+    <string name="app_name">Donation 5.0</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -23,4 +23,7 @@
     <string name="reportTitle">Report</string>
     <string name="defaultAmount">00</string>
     <string name="defaultMethod">N/A</string>
+    <string name="defaultUpvotes">00</string>
+    <string name="method">Method</string>
+    <string name="upvotes">Upvotes</string>
 </resources>

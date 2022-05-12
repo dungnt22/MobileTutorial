@@ -11,9 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DonationApp extends Application {
-    public  final int target = 10000;
+    private final int target = 10000;
     private int totalDonated = 0;
-    public DBManager dbManager;
+    public List<Donation> donations = new ArrayList<Donation>();
+
+    public int getTarget() {
+        return target;
+    }
 
     public int getTotalDonated() {
         return totalDonated;
@@ -23,12 +27,9 @@ public class DonationApp extends Application {
         this.totalDonated = totalDonated;
     }
 
-    public boolean newDonation(Donation donation) {
+    public boolean newDonation() {
         boolean targetAchieved = totalDonated > target;
-        if (!targetAchieved) {
-            dbManager.add(donation);
-            totalDonated += donation.amount;
-        } else {
+        if (targetAchieved) {
             Toast.makeText(this, "Target Exceeded!", Toast.LENGTH_SHORT).show();
         }
         return targetAchieved;
@@ -37,7 +38,5 @@ public class DonationApp extends Application {
     public void onCreate() {
         super.onCreate();
         Log.v("Donate", "Donation App Started");
-        dbManager = new DBManager(this);
-        Log.v("Donate", "Database Created");
     }
 }

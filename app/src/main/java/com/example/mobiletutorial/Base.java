@@ -2,6 +2,7 @@ package com.example.mobiletutorial;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,19 +13,21 @@ import com.example.main.DonationApp;
 public class Base extends AppCompatActivity {
     public DonationApp donationApp;
 
+    public Base() {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         donationApp = (DonationApp) getApplication();
-        donationApp.dbManager.open();
-        donationApp.dbManager.setTotalDonated(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        donationApp.dbManager.close();
+//        donationApp.dbManager.close();
     }
 
     @Override
@@ -40,7 +43,7 @@ public class Base extends AppCompatActivity {
         MenuItem donate = menu.findItem(R.id.menuDonate);
         MenuItem reset = menu.findItem(R.id.menuReset);
 
-        if (donationApp.dbManager.getAll().isEmpty()) {
+        if (donationApp.donations.isEmpty()) {
             report.setEnabled(false);
             reset.setEnabled(false);
         } else {
@@ -50,14 +53,14 @@ public class Base extends AppCompatActivity {
 
         if (this instanceof MainActivity) {
             donate.setVisible(false);
-            if (!donationApp.dbManager.getAll().isEmpty()) {
+            if (!donationApp.donations.isEmpty()) {
                 report.setEnabled(true);
                 reset.setEnabled(true);
             }
         } else {
             report.setVisible(false);
             donate.setVisible(true);
-            reset.setVisible(true);
+            reset.setVisible(false);
         }
         return true;
     }
